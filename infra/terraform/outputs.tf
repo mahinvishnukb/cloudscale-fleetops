@@ -22,7 +22,7 @@ output "log_group" {
 
 output "smoke_test_command" {
   description = "Drop a manifest into the bucket and watch the Lambda pick it up."
-  value = join(" ", [
+  value       = join(" ", [
     "awslocal s3 cp ./sample-manifest.csv",
     "s3://${aws_s3_bucket.manifests.id}/incoming/9074729/V-2026-014.csv"
   ])
