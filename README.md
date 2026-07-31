@@ -1,5 +1,7 @@
 # CloudScale FleetOps
 
+[![CI](https://github.com/mahinvishnukb/cloudscale-fleetops/actions/workflows/ci.yml/badge.svg)](https://github.com/mahinvishnukb/cloudscale-fleetops/actions/workflows/ci.yml)
+
 Maritime fleet operations platform: live vessel telemetry, rule-based anomaly detection, and
 event-driven cargo-manifest ingestion.
 
