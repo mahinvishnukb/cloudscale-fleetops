@@ -32,6 +32,8 @@ override.tf.json
 
 # ---- Secrets / local env ----
 .env
+# neonctl writes its org/project context here; not secret, but machine-specific.
+.neon
 .env.local
 *.pem
 *.key
