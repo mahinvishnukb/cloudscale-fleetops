@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth.service';
 import { TelemetryStreamService } from '../../core/telemetry-stream.service';
 
@@ -40,12 +41,30 @@ import { TelemetryStreamService } from '../../core/telemetry-stream.service';
           {{ busy() ? 'Signing in…' : 'Sign in' }}
         </button>
 
+        <!--
+          The hosted demo has to show a usable password: a visitor has no .env to read
+          from, and a sign-in screen they cannot get past is worse than no demo at all.
+          The accounts are seeded, the data is synthetic, and the three roles exist only
+          to show RBAC, so publishing the password costs nothing.
+          Running locally, the password is whatever DEMO_PASSWORD is set to instead.
+        -->
         <p class="text-center text-xs text-slate-500">
           Demo accounts: <code class="text-slate-400">admin</code>,
           <code class="text-slate-400">manager</code>,
           <code class="text-slate-400">analyst</code>
-          — password from <code>DEMO_PASSWORD</code> in your .env
+          @if (isHostedDemo) {
+            — password <code class="text-slate-400">{{ demoPassword }}</code>
+          } @else {
+            — password from <code>DEMO_PASSWORD</code> in your .env
+          }
         </p>
+        @if (isHostedDemo) {
+          <p class="text-center text-xs text-slate-600">
+            Each role sees a different dashboard: only
+            <code class="text-slate-500">admin</code> and
+            <code class="text-slate-500">manager</code> can change vessel status.
+          </p>
+        }
       </form>
 
       <p class="mt-4 text-center text-xs text-slate-600">
@@ -62,6 +81,12 @@ export class LoginComponent {
 
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  /** True on the deployed demo, false for `ng serve` and any self-hosted build. */
+  protected readonly isHostedDemo = environment.production;
+
+  /** Matches Database__DemoPassword in render.yaml / .env.example. */
+  protected readonly demoPassword = 'fleetops-demo-2026';
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     username: ['admin', [Validators.required]],

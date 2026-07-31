@@ -43,14 +43,21 @@ if (url.protocol !== 'https:' && url.hostname !== 'localhost') {
 const origin = url.origin;
 
 const source = readFileSync(target, 'utf8');
-const updated = source.replace(
-  /(apiBaseUrl:\s*)'[^']*'/,
-  `$1'${origin}'`,
-);
+const pattern = /(apiBaseUrl:\s*)'[^']*'/;
 
-if (updated === source) {
+// Test for the pattern separately from testing whether the content changed. An
+// already-correct value produces an identical string, and treating that as
+// "pattern not found" fails the build for a file that was perfectly fine.
+if (!pattern.test(source)) {
   console.error('[set-api-url] could not find apiBaseUrl in environment.prod.ts');
   process.exit(1);
+}
+
+const updated = source.replace(pattern, `$1'${origin}'`);
+
+if (updated === source) {
+  console.log(`[set-api-url] apiBaseUrl already ${origin}; nothing to do.`);
+  process.exit(0);
 }
 
 writeFileSync(target, updated);
