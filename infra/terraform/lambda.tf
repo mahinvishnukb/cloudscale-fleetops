@@ -25,9 +25,9 @@ data "aws_iam_policy_document" "manifest_processor" {
   }
 
   statement {
-    sid       = "WriteProcessedManifests"
-    effect    = "Allow"
-    actions   = ["s3:PutObject"]
+    sid     = "WriteProcessedManifests"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
     resources = [
       "${aws_s3_bucket.manifests.arn}/processed/*",
       "${aws_s3_bucket.manifests.arn}/rejected/*",
@@ -42,8 +42,8 @@ data "aws_iam_policy_document" "manifest_processor" {
   }
 
   statement {
-    sid     = "WriteLogs"
-    effect  = "Allow"
+    sid    = "WriteLogs"
+    effect = "Allow"
     actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",

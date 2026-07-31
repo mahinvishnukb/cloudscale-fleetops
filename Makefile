@@ -37,6 +37,15 @@ clean: ## Stop the local stack and delete its volumes
 logs: ## Tail the API logs
 	docker compose logs -f api
 
+.PHONY: fmt
+fmt: dot-clean ## Format the Terraform (runs in Docker; no local terraform needed)
+	@# CI runs `terraform fmt -check`, and its alignment rules are not guessable:
+	@# a value that opens a multi-line expression is excluded from the surrounding
+	@# alignment group, and a comment between attributes breaks the group too.
+	@# Always run the real formatter rather than hand-aligning.
+	docker run --rm -v "$(CURDIR)/infra/terraform:/work" -w /work \
+		hashicorp/terraform:1.9 fmt -recursive
+
 # ---- Backend --------------------------------------------------------------
 .PHONY: build
 build: ## Build the .NET solution

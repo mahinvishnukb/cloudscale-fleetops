@@ -1,5 +1,5 @@
 locals {
-  name_prefix     = "${var.project_name}-${var.environment}"
+  name_prefix = "${var.project_name}-${var.environment}"
   # Must match AWS__ManifestBucket used by the API and docker-compose, otherwise the
   # direct-upload path and the Lambda pipeline end up on two different buckets.
   manifest_bucket = "${var.project_name}-manifests-upload-${var.environment}"
