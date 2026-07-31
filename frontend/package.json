@@ -1,12 +1,13 @@
 {
   "name": "fleetops-ui",
   "version": "1.0.0",
-  "description": "CloudScale FleetOps dashboard — Angular 22 standalone components with signals, zoneless.",
+  "description": "CloudScale FleetOps dashboard \u2014 Angular 22 standalone components with signals, zoneless.",
   "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "prebuild:prod": "node scripts/set-api-url.mjs",
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
