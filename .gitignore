@@ -1,0 +1,55 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.nupkg
+
+# ---- Node / Angular ----
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+.nx/
+
+# ---- Terraform ----
+.terraform/
+# .terraform.lock.hcl is deliberately NOT ignored: HashiCorp recommends committing it
+# so every clone and CI run resolves identical provider versions.
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+
+# ---- Secrets / local env ----
+.env
+.env.local
+*.pem
+*.key
+appsettings.Local.json
+secrets.auto.tfvars
+
+# ---- IDE / OS ----
+.vs/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+# macOS AppleDouble sidecars, created when files are edited on a non-HFS volume
+._*
+.Spotlight-V100
+.Trashes
+
+# ---- LocalStack ----
+volume/
+.localstack/

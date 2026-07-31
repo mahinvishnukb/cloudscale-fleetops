@@ -1,0 +1,15 @@
+# Copy to terraform.tfvars and adjust. terraform.tfvars is git-ignored.
+
+aws_region  = "ca-central-1"
+environment = "dev"
+
+# Keep this true. Setting it to false provisions real, billable AWS resources.
+use_localstack      = true
+localstack_endpoint = "http://localhost:4566"
+
+lambda_architecture = "arm64"
+lambda_memory_mb    = 512
+
+# Do NOT put the real connection string here. Pass it at apply time:
+#   TF_VAR_database_connection_string="Host=...;Password=..." terraform apply
+# database_connection_string = ""

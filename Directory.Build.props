@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <!-- Warnings stay warnings locally so the build never blocks a demo.
+         CI passes the warnaserror flag to stop them accumulating. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- macOS writes AppleDouble sidecar files (._Foo.cs) when the repo lives on a
+         non-APFS volume such as an external drive. They are binary, and the SDK's
+         default **/*.cs glob would otherwise hand them to the compiler.
+         DefaultItemExcludes is the supported hook: it is read by the SDK when it
+         builds the default item globs, which happens after this file is imported. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/._*</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,95 @@
+# Local stack: Postgres + LocalStack (fake AWS) + the API.
+# Everything here is free and runs on your machine.
+#
+#   cp .env.example .env   # then set POSTGRES_PASSWORD, Jwt__Key, DEMO_PASSWORD
+#   docker compose up --build
+#
+# API:        http://localhost:5080
+# Swagger:    http://localhost:5080/swagger
+# LocalStack: http://localhost:4566
+
+name: fleetops
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fleetops-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fleetops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-fleetops}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-fleetops} -d ${POSTGRES_DB:-fleetops}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3
+    container_name: fleetops-localstack
+    environment:
+      SERVICES: s3,lambda,iam,sts,logs,sqs,apigateway
+      DEBUG: '0'
+      AWS_DEFAULT_REGION: ca-central-1
+      MANIFEST_BUCKET: ${AWS__ManifestBucket:-fleetops-manifests-upload-dev}
+      # Community edition only. Nothing here requires LocalStack Pro.
+    ports:
+      - '4566:4566'
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Anything in ready.d runs once LocalStack reports healthy. This replaces a
+      # separate aws-cli container: the image already ships `awslocal`.
+      - ./scripts/localstack-init:/etc/localstack/init/ready.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -sf http://localhost:4566/_localstack/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build:
+      # Repo root: the Directory.*.props files live there.
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fleetops-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__FleetOpsDb: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-fleetops};Username=${POSTGRES_USER:-fleetops};Password=${POSTGRES_PASSWORD}
+      # Quoted: the error message contains a colon, which YAML would otherwise read
+      # as the start of a nested mapping.
+      Jwt__Key: "${Jwt__Key:?set Jwt__Key in .env - generate one with openssl rand -base64 48}"
+      Jwt__Issuer: fleetops-api
+      Jwt__Audience: fleetops-ui
+      AWS__ServiceUrl: http://localstack:4566
+      AWS__Region: ca-central-1
+      AWS__ManifestBucket: ${AWS__ManifestBucket:-fleetops-manifests-upload-dev}
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      Cors__AllowedOrigins__0: http://localhost:4200
+      Database__SeedDemoData: 'true'
+      Database__DemoPassword: ${DEMO_PASSWORD:?set DEMO_PASSWORD in .env}
+      Telemetry__Simulator__Enabled: 'true'
+      Swagger__Enabled: 'true'
+      # Optional live AIS. With no key the simulator runs instead.
+      Ais__Enabled: ${Ais__Enabled:-false}
+      Ais__ApiKey: ${Ais__ApiKey:-}
+    ports:
+      - '5080:8080'
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  localstack-data:

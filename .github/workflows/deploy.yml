@@ -1,0 +1,78 @@
+name: Deploy
+
+# Manual only. Nothing in this repository deploys to a paid environment on its own.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to deploy'
+        required: true
+        default: 'render-vercel'
+        type: choice
+        options:
+          - render-vercel
+          - kubernetes
+
+jobs:
+  render-vercel:
+    name: Render (API) + Vercel (UI)
+    if: inputs.target == 'render-vercel'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Render redeploys from its own GitHub integration on push to main.
+      # This hook is only needed if auto-deploy is turned off.
+      - name: Trigger the Render deploy
+        if: vars.RENDER_DEPLOY_HOOK_CONFIGURED == 'true'
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build the UI
+        working-directory: frontend
+        env:
+          FLEETOPS_API_URL: ${{ vars.FLEETOPS_API_URL }}
+        run: |
+          npm ci
+          # Bake the API origin into the production environment file.
+          if [ -n "$FLEETOPS_API_URL" ]; then
+            sed -i "s#apiBaseUrl: '.*'#apiBaseUrl: '${FLEETOPS_API_URL}'#" src/environments/environment.prod.ts
+          fi
+          npm run build:prod
+
+      - name: Deploy to Vercel
+        working-directory: frontend
+        run: |
+          npm i -g vercel@latest
+          vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  kubernetes:
+    name: Kubernetes (EKS or self-managed)
+    if: inputs.target == 'kubernetes'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Roll out
+        run: |
+          kubectl -n fleetops set image deployment/fleetops-api \
+            api=ghcr.io/${{ github.repository_owner }}/fleetops-api:${{ github.sha }}
+          kubectl -n fleetops rollout status deployment/fleetops-api --timeout=300s
+
+      - name: Roll back on failure
+        if: failure()
+        run: kubectl -n fleetops rollout undo deployment/fleetops-api

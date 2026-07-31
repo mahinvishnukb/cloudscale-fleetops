@@ -1,0 +1,31 @@
+# Build context is the repo root; keep it small.
+.git/
+.github/
+docs/
+frontend/
+infra/
+k8s/
+scripts/
+
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+**/TestResults/
+**/.vs/
+**/.vscode/
+**/.idea/
+
+**/appsettings.Local.json
+.env
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# macOS AppleDouble sidecars. Both patterns are needed: `**/._*` does not match at
+# the context root, which is where ._Makefile lives.
+._*
+**/._*
+.DS_Store
+**/.DS_Store

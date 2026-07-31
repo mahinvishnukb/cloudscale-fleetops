@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fleetops-api
+  namespace: fleetops
+spec:
+  # Keeps at least one pod serving during node drains and cluster upgrades.
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fleetops-api

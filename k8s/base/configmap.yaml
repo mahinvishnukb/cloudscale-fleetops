@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fleetops-api-config
+  namespace: fleetops
+data:
+  ASPNETCORE_ENVIRONMENT: 'Production'
+  ASPNETCORE_URLS: 'http://+:8080'
+  AWS__Region: 'ca-central-1'
+  AWS__ManifestBucket: 'fleetops-manifests-upload-dev'
+  Jwt__Issuer: 'fleetops-api'
+  Jwt__Audience: 'fleetops-ui'
+  Cors__AllowedOrigins__0: 'http://fleetops.localtest.me'
+  Telemetry__Simulator__Enabled: 'true'
+  Telemetry__Simulator__IntervalSeconds: '10'
+  Swagger__Enabled: 'true'

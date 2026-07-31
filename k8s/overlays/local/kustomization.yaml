@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fleetops
+
+resources:
+  - ../../base
+  - postgres.yaml
+  - secret-local.yaml
+
+# Local single-node cluster: one replica, no autoscaling, no disruption budget.
+replicas:
+  - name: fleetops-api
+    count: 1
+
+patches:
+  - path: patch-local.yaml
+    target:
+      kind: Deployment
+      name: fleetops-api
+  - patch: |-
+      $patch: delete
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: fleetops-api
+        namespace: fleetops
+  - patch: |-
+      $patch: delete
+      apiVersion: policy/v1
+      kind: PodDisruptionBudget
+      metadata:
+        name: fleetops-api
+        namespace: fleetops
+
+images:
+  - name: ghcr.io/mahinvishnukb/fleetops-api
+    newName: fleetops-api
+    newTag: local

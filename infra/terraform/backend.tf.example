@@ -1,0 +1,15 @@
+# Production-shaped remote state. Not enabled by default — an S3 bucket plus a
+# DynamoDB lock table costs money, and this project runs on LocalStack.
+#
+# To use it: rename to backend.tf, create the bucket and table once by hand,
+# then `terraform init -migrate-state`.
+#
+# terraform {
+#   backend "s3" {
+#     bucket         = "fleetops-tfstate"
+#     key            = "dev/terraform.tfstate"
+#     region         = "ca-central-1"
+#     dynamodb_table = "fleetops-tfstate-lock"
+#     encrypt        = true
+#   }
+# }

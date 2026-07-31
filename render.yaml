@@ -1,0 +1,62 @@
+# Render Blueprint — free-tier deployment of the API.
+#
+# Free web services sleep after 15 minutes of inactivity and take 30–60 seconds to
+# wake. The Angular login screen tells the user that, so a recruiter clicking a cold
+# link sees an explanation rather than a hang.
+#
+# The database is NOT defined here on purpose: Render's free Postgres expires after
+# 30 days. Use Neon's free tier instead (permanent, no card) and paste its connection
+# string into DATABASE_URL below.
+
+services:
+  - type: web
+    name: fleetops-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/live
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: PORT
+        value: 8080
+
+      # Paste the Neon connection string here (Render dashboard → Environment).
+      # Format: Host=ep-xxx.neon.tech;Database=fleetops;Username=...;Password=...;SSL Mode=Require;Trust Server Certificate=true
+      - key: ConnectionStrings__FleetOpsDb
+        sync: false
+
+      # Generated once by Render and kept stable across deploys.
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: fleetops-api
+      - key: Jwt__Audience
+        value: fleetops-ui
+
+      # Set to your Vercel URL, e.g. https://fleetops-ui.vercel.app
+      - key: Cors__AllowedOrigins__0
+        sync: false
+
+      - key: Database__SeedDemoData
+        value: 'true'
+      - key: Database__DemoPassword
+        sync: false
+
+      - key: Telemetry__Simulator__Enabled
+        value: 'true'
+      - key: Telemetry__Simulator__IntervalSeconds
+        value: '20'
+      - key: Swagger__Enabled
+        value: 'true'
+
+      # S3 is not reachable from the free tier without AWS credentials. Manifest
+      # upload therefore returns an error in the hosted demo; the Lambda path is
+      # demonstrated locally against LocalStack instead.
+      - key: AWS__ServiceUrl
+        value: ''

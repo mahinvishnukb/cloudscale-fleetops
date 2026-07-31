@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetops-api
+  namespace: fleetops
+spec:
+  template:
+    spec:
+      containers:
+        - name: api
+          # k3d images are imported, never pulled.
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 384Mi
+          env:
+            - name: ConnectionStrings__FleetOpsDb
+              value: 'Host=postgres;Port=5432;Database=fleetops;Username=fleetops;Password=localdev'

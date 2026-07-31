@@ -1,0 +1,31 @@
+# Free local Kubernetes. Creates a real multi-node cluster inside Docker:
+#   k3d cluster create --config k8s/k3d-cluster.yaml
+#
+# This is genuine Kubernetes (k3s), so the manifests in k8s/base are exercised
+# for real — Deployment, Service, Ingress, probes, rolling updates and all.
+# What it cannot exercise: IRSA, the AWS Load Balancer Controller, and EBS volumes.
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: fleetops
+
+servers: 1
+agents: 2
+
+ports:
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+
+options:
+  k3d:
+    wait: true
+    timeout: '120s'
+  k3s:
+    nodeLabels:
+      - label: topology.kubernetes.io/zone=local-a
+        nodeFilters:
+          - agent:0
+      - label: topology.kubernetes.io/zone=local-b
+        nodeFilters:
+          - agent:1

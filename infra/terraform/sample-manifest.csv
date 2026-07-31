@@ -1,0 +1,7 @@
+container_number,description,gross_weight_kg,origin_port,destination_port,hazard_class
+CSQU3054383,Machine parts,12000,CAVAN,NLRTM,
+MSKU3820945,Textiles,8000,CAVAN,NLRTM,
+TGHU1234567,Industrial paint,4200,CAVAN,NLRTM,3
+APZU4412345,Frozen seafood,18500,CAPRR,JPTYO,
+NOTAVALIDBOX,Mystery cargo,900,CAVAN,NLRTM,
+CSQU3054383,Duplicate filing,1000,CAVAN,NLRTM,
