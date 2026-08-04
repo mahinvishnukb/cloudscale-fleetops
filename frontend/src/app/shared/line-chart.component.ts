@@ -32,7 +32,9 @@ export interface Series {
 @Component({
   selector: 'app-line-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div class="relative h-64"><canvas #canvas></canvas></div>`,
+  // Shorter on a phone: a 256px-tall chart inside a ~310px-wide card is nearly square,
+  // which squashes the time axis and makes the labels collide.
+  template: `<div class="relative h-48 sm:h-64"><canvas #canvas></canvas></div>`,
 })
 export class LineChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('canvas') private canvasRef?: ElementRef<HTMLCanvasElement>;

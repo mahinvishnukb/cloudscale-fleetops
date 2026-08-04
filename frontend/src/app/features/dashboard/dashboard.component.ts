@@ -27,7 +27,12 @@ import { StatCardComponent } from '../../shared/stat-card.component';
         </p>
       }
 
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <!--
+        Two columns even on the narrowest phone. Stacking four cards vertically pushed
+        the fleet table roughly 400px down the page, so the first thing you saw on a
+        phone was a column of numbers and no context.
+      -->
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <app-stat-card label="Vessels tracked" [value]="health()?.totalVessels ?? '—'" />
         <app-stat-card
           label="Under way"
@@ -127,7 +132,7 @@ import { StatCardComponent } from '../../shared/stat-card.component';
                   @if (auth.canManageFleet()) {
                     <button
                       type="button"
-                      class="btn-ghost mt-2 w-full px-2 py-1 text-[11px]"
+                      class="btn-ghost mt-2 w-full px-2 py-2 text-[11px] sm:py-1"
                       (click)="acknowledge(anomaly)"
                     >
                       Acknowledge

@@ -45,7 +45,7 @@ import { StatCardComponent } from '../../shared/stat-card.component';
         <p class="rounded border border-rose-800 bg-rose-950 px-3 py-2 text-sm text-rose-300">{{ error() }}</p>
       }
 
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <app-stat-card label="Speed" [value]="latest() ? latest()!.speedOverGroundKn.toFixed(1) + ' kn' : '—'" />
         <app-stat-card
           label="Engine temp"
@@ -61,13 +61,14 @@ import { StatCardComponent } from '../../shared/stat-card.component';
       </div>
 
       <section class="card">
-        <div class="mb-3 flex items-center justify-between">
+        <!-- Wraps: the heading plus three range buttons exceed a 375px screen on one line. -->
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 class="text-sm font-semibold text-white">Speed and engine temperature</h2>
           <div class="flex gap-1">
             @for (window of windows; track window) {
               <button
                 type="button"
-                class="rounded px-2 py-1 text-xs"
+                class="rounded px-3 py-2 text-xs sm:px-2 sm:py-1"
                 [class]="hours() === window ? 'bg-sea-600 text-white' : 'text-slate-400 hover:text-slate-200'"
                 (click)="setWindow(window)"
               >

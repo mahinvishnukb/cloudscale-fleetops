@@ -3,6 +3,12 @@ module.exports = {
   content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {
+      screens: {
+        // Tailwind's smallest default breakpoint is 640px, which leaves the 320-430px
+        // range every phone actually sits in with no breakpoint of its own. `xs` covers
+        // the gap between a small phone in portrait and a large one.
+        xs: '400px',
+      },
       colors: {
         ink: {
           900: '#0b1220',

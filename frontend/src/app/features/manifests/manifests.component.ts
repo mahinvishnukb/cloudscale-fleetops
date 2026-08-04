@@ -51,8 +51,14 @@ import { manifestStatusClasses, relativeTime } from '../../core/format';
             </div>
           </div>
 
-          <div class="mt-3 flex items-center gap-3">
-            <button type="button" class="btn-primary" [disabled]="!canUpload() || uploading()" (click)="upload()">
+          <!-- Stacks on a phone: side by side, the explanatory note crushes the button. -->
+          <div class="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              class="btn-primary w-full shrink-0 sm:w-auto"
+              [disabled]="!canUpload() || uploading()"
+              (click)="upload()"
+            >
               {{ uploading() ? 'Uploading…' : 'Upload and ingest' }}
             </button>
 
